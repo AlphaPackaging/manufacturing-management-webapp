@@ -184,5 +184,119 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  return json({ success: true, data: { id: inserted.id } }, 201);
+  const productionRunId = inserted.id as string;
+
+  // ── Stock ledger entries & products_stock updates ──────────────────
+
+  // Helper: update products_stock quantity for a given product
+  async function updateProductStock(
+    productId: string,
+    quantityChange: number
+  ): Promise<string | null> {
+    const { data: stockRow, error: readErr } = await supabase
+      .from("products_stock")
+      .select("id, quantity")
+      .eq("product_id", productId)
+      .single();
+
+    if (readErr || !stockRow) {
+      return `Failed to read stock for product ${productId}`;
+    }
+
+    const newQty = Number(stockRow.quantity) + quantityChange;
+
+    const { error: updateErr } = await supabase
+      .from("products_stock")
+      .update({ quantity: newQty })
+      .eq("id", stockRow.id);
+
+    if (updateErr) {
+      return `Failed to update stock for product ${productId}`;
+    }
+
+    return null;
+  }
+
+  // 1. Finished good: +actual_pieces_produced (pcs)
+  if (actual_pieces_produced > 0) {
+    const { error: fgLedgerErr } = await supabase
+      .from("stock_ledger")
+      .insert({
+        product_id,
+        quantity_change: actual_pieces_produced,
+        uom: "pcs",
+        transaction_source_table: "production_runs",
+        transaction_id: productionRunId,
+        notes: `Production run: +${actual_pieces_produced} pcs produced`,
+        created_by: user.id,
+      });
+
+    if (fgLedgerErr) {
+      return json(
+        { success: false, error: "Failed to create finished good ledger entry" },
+        500
+      );
+    }
+
+    const fgStockErr = await updateProductStock(product_id, actual_pieces_produced);
+    if (fgStockErr) {
+      return json({ success: false, error: fgStockErr }, 500);
+    }
+  }
+
+  // 2. Raw material: -raw_material_bags_used (bags)
+  if (raw_material_id && raw_material_bags_used > 0) {
+    const { error: rmLedgerErr } = await supabase
+      .from("stock_ledger")
+      .insert({
+        product_id: raw_material_id,
+        quantity_change: -raw_material_bags_used,
+        uom: "bags",
+        transaction_source_table: "production_runs",
+        transaction_id: productionRunId,
+        notes: `Production run: -${raw_material_bags_used} bags consumed`,
+        created_by: user.id,
+      });
+
+    if (rmLedgerErr) {
+      return json(
+        { success: false, error: "Failed to create raw material ledger entry" },
+        500
+      );
+    }
+
+    const rmStockErr = await updateProductStock(raw_material_id, -raw_material_bags_used);
+    if (rmStockErr) {
+      return json({ success: false, error: rmStockErr }, 500);
+    }
+  }
+
+  // 3. Master batch: -master_batch_bags_used (bags)
+  if (master_batch_id && master_batch_bags_used > 0) {
+    const { error: mbLedgerErr } = await supabase
+      .from("stock_ledger")
+      .insert({
+        product_id: master_batch_id,
+        quantity_change: -master_batch_bags_used,
+        uom: "bags",
+        transaction_source_table: "production_runs",
+        transaction_id: productionRunId,
+        notes: `Production run: -${master_batch_bags_used} bags consumed`,
+        created_by: user.id,
+      });
+
+    if (mbLedgerErr) {
+      return json(
+        { success: false, error: "Failed to create master batch ledger entry" },
+        500
+      );
+    }
+
+    const mbStockErr = await updateProductStock(master_batch_id, -master_batch_bags_used);
+    if (mbStockErr) {
+      return json({ success: false, error: mbStockErr }, 500);
+    }
+  }
+
+  return json({ success: true, data: { id: productionRunId } }, 201);
 }
