@@ -23,7 +23,7 @@ export function StockTypeFilter() {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function navigate(params: URLSearchParams) {
-    router.push(`/dashboard/stock?${params.toString()}`);
+    router.push(`/dashboard/inventory?${params.toString()}`);
   }
 
   function handleFilter(value: string) {
