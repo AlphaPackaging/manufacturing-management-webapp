@@ -94,6 +94,17 @@ export function NewProductionRunDialog({
     onOpenChange(nextOpen);
   }
 
+  function handleShiftChange(value: string) {
+    setShift(value);
+    if (value === "DAY") {
+      setStartedAt("06:00");
+      setCompletedAt("18:00");
+    } else if (value === "NIGHT") {
+      setStartedAt("18:00");
+      setCompletedAt("06:00");
+    }
+  }
+
   function handleProductSelect(product: FinishedGoodProduct) {
     setSelectedProduct(product);
     setProductPopoverOpen(false);
@@ -156,10 +167,12 @@ export function NewProductionRunDialog({
       };
 
       if (startedAt) {
-        body.started_at = new Date(startedAt).toISOString();
+        const today = new Date().toISOString().slice(0, 10);
+        body.started_at = new Date(`${today}T${startedAt}`).toISOString();
       }
       if (completedAt) {
-        body.completed_at = new Date(completedAt).toISOString();
+        const today = new Date().toISOString().slice(0, 10);
+        body.completed_at = new Date(`${today}T${completedAt}`).toISOString();
       }
 
       const res = await fetch("/api/production-runs", {
@@ -386,7 +399,7 @@ export function NewProductionRunDialog({
             {/* Shift */}
             <div className="space-y-2">
               <Label>Shift</Label>
-              <Select value={shift} onValueChange={setShift} disabled={loading}>
+              <Select value={shift} onValueChange={handleShiftChange} disabled={loading}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select shift..." />
                 </SelectTrigger>
@@ -402,7 +415,7 @@ export function NewProductionRunDialog({
               <Label htmlFor="started-at">Started At</Label>
               <Input
                 id="started-at"
-                type="datetime-local"
+                type="time"
                 value={startedAt}
                 onChange={(e) => setStartedAt(e.target.value)}
                 disabled={loading}
@@ -414,7 +427,7 @@ export function NewProductionRunDialog({
               <Label htmlFor="completed-at">Completed At</Label>
               <Input
                 id="completed-at"
-                type="datetime-local"
+                type="time"
                 value={completedAt}
                 onChange={(e) => setCompletedAt(e.target.value)}
                 disabled={loading}

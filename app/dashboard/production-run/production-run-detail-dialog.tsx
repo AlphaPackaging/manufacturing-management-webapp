@@ -33,7 +33,14 @@ function DetailRow({
 
 function formatDateTime(iso: string | null): string {
   if (!iso) return "—";
-  return new Date(iso).toLocaleString();
+  return new Date(iso).toLocaleString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
 }
 
 export function ProductionRunDetailDialog({
