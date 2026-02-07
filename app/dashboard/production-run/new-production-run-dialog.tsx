@@ -66,8 +66,7 @@ export function NewProductionRunDialog({
   const [masterBatchBagsUsed, setMasterBatchBagsUsed] = useState("");
   const [shift, setShift] = useState("");
   const today = new Date().toISOString().slice(0, 10);
-  const [startedAt, setStartedAt] = useState(today);
-  const [completedAt, setCompletedAt] = useState(today);
+  const [runDate, setRunDate] = useState(today);
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -82,8 +81,7 @@ export function NewProductionRunDialog({
     setMasterBatchId("");
     setMasterBatchBagsUsed("");
     setShift("");
-    setStartedAt(new Date().toISOString().slice(0, 10));
-    setCompletedAt(new Date().toISOString().slice(0, 10));
+    setRunDate(new Date().toISOString().slice(0, 10));
     setError(null);
     setLoading(false);
   }
@@ -160,11 +158,8 @@ export function NewProductionRunDialog({
         shift,
       };
 
-      if (startedAt) {
-        body.started_at = new Date(startedAt).toISOString();
-      }
-      if (completedAt) {
-        body.completed_at = new Date(completedAt).toISOString();
+      if (runDate) {
+        body.run_date = runDate;
       }
 
       const res = await fetch("/api/production-runs", {
@@ -402,26 +397,14 @@ export function NewProductionRunDialog({
               </Select>
             </div>
 
-            {/* Started At */}
+            {/* Run Date */}
             <div className="space-y-2">
-              <Label htmlFor="started-at">Started At</Label>
+              <Label htmlFor="run-date">Run Date</Label>
               <Input
-                id="started-at"
+                id="run-date"
                 type="date"
-                value={startedAt}
-                onChange={(e) => setStartedAt(e.target.value)}
-                disabled={loading}
-              />
-            </div>
-
-            {/* Completed At */}
-            <div className="space-y-2">
-              <Label htmlFor="completed-at">Completed At</Label>
-              <Input
-                id="completed-at"
-                type="date"
-                value={completedAt}
-                onChange={(e) => setCompletedAt(e.target.value)}
+                value={runDate}
+                onChange={(e) => setRunDate(e.target.value)}
                 disabled={loading}
               />
             </div>

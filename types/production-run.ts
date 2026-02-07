@@ -40,8 +40,7 @@ export interface ProductionRunRow {
   raw_material_bags_used: number;
   master_batch_bags_used: number;
   shift: string;
-  started_at: string | null;
-  completed_at: string | null;
+  run_date: string;
   created_at: string;
   product_name: string;
   product_sku: string;

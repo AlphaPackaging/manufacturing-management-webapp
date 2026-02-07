@@ -45,7 +45,7 @@ export default async function ProductionRunPage() {
       .select(
         `id, target_quantity, actual_pieces_produced, waste_quantity,
          raw_material_bags_used, master_batch_bags_used, shift,
-         started_at, completed_at, created_at,
+         run_date, created_at,
          product:products!production_runs_product_id_fkey ( sku, name ),
          machine:machines!production_runs_machine_id_fkey ( name ),
          raw_material:products!production_runs_raw_material_id_fkey ( name ),
@@ -81,8 +81,7 @@ export default async function ProductionRunPage() {
       raw_material_bags_used: Number(row.raw_material_bags_used),
       master_batch_bags_used: Number(row.master_batch_bags_used),
       shift: row.shift as string,
-      started_at: (row.started_at as string) ?? null,
-      completed_at: (row.completed_at as string) ?? null,
+      run_date: row.run_date as string,
       created_at: row.created_at as string,
       product_name: product?.name ?? "—",
       product_sku: product?.sku ?? "—",

@@ -12,8 +12,7 @@ interface ProductionRunBody {
   master_batch_id: string | null;
   master_batch_bags_used: number;
   shift: string;
-  started_at?: string;
-  completed_at?: string;
+  run_date?: string;
 }
 
 function json(
@@ -54,8 +53,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     master_batch_id,
     master_batch_bags_used,
     shift,
-    started_at,
-    completed_at,
+    run_date,
   } = body;
 
   // Validate required fields
@@ -216,11 +214,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     created_by: user.id,
   };
 
-  if (started_at) {
-    insertData.started_at = started_at;
-  }
-  if (completed_at) {
-    insertData.completed_at = completed_at;
+  if (run_date) {
+    insertData.run_date = run_date;
   }
 
   const { data: inserted, error: insertError } = await supabase

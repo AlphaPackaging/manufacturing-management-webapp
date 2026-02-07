@@ -12,7 +12,7 @@ export default async function StockPage({
 
   let query = supabase
     .from("products_stock")
-    .select("id, quantity, uom, products!inner ( id, sku, name, type )")
+    .select("id, quantity, uom, products!inner ( id, sku, name, type, color )")
     .order("name", { ascending: true, referencedTable: "products" });
 
   const activeType = type ?? "FINISHED_GOOD";
@@ -40,6 +40,7 @@ export default async function StockPage({
           sku: product.sku as string,
           name: product.name as string,
           type: product.type as string,
+          color: (product.color as string) ?? null,
         },
       };
     })
@@ -53,7 +54,7 @@ export default async function StockPage({
 
       <div className="space-y-3">
         <h3 className="text-lg font-medium">Current Stock</h3>
-        <InventoryTable productsStock={productsStock} />
+        <InventoryTable productsStock={productsStock} productType={activeType} />
       </div>
     </div>
   );

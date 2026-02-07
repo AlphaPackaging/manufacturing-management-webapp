@@ -66,7 +66,7 @@ function groupByDay(
   const map = new Map<string, ProductionRunRow[]>();
 
   for (const run of runs) {
-    const dateKey = new Date(run.created_at).toISOString().slice(0, 10);
+    const dateKey = run.run_date;
     const existing = map.get(dateKey);
     if (existing) {
       existing.push(run);

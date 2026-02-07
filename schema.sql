@@ -125,8 +125,7 @@ CREATE TABLE public.production_runs (
   master_batch_id         uuid REFERENCES public.products(id),
   master_batch_bags_used  numeric NOT NULL DEFAULT 0,
   shift                   public.shift_type NOT NULL,
-  started_at              timestamptz,
-  completed_at            timestamptz,
+  run_date                date NOT NULL DEFAULT CURRENT_DATE,
   created_by              uuid NOT NULL REFERENCES public.users_profile(user_id),
   created_at              timestamptz NOT NULL DEFAULT now()
 );

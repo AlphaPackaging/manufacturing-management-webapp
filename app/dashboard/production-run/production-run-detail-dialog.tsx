@@ -106,8 +106,7 @@ export function ProductionRunDetailDialog({
           <DetailRow label="RM Bags Used" value={run.raw_material_bags_used} />
           <DetailRow label="Master Batch" value={run.master_batch_name ?? "—"} />
           <DetailRow label="MB Bags Used" value={run.master_batch_bags_used} />
-          <DetailRow label="Started At" value={formatDate(run.started_at)} />
-          <DetailRow label="Completed At" value={formatDate(run.completed_at)} />
+          <DetailRow label="Run Date" value={formatDate(run.run_date)} />
           <DetailRow label="Created By" value={run.created_by_name ?? "—"} />
         </div>
       </DialogContent>
