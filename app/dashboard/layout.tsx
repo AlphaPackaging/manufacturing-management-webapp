@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SidebarNav } from "./sidebar-nav";
 import { LogoutButton } from "./logout-button";
+import { IdleTimeout } from "./idle-timeout";
 
 export default async function DashboardLayout({
   children,
@@ -41,6 +42,7 @@ export default async function DashboardLayout({
           </div>
         </header>
         <main className="flex-1 p-6">{children}</main>
+        <IdleTimeout />
       </div>
     </div>
   );
