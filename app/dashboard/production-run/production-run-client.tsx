@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Plus } from "lucide-react";
+import { Moon, Plus, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -144,7 +144,12 @@ export function ProductionRunClient({
                             {run.product_sku}
                           </p>
                         </div>
-                        <Badge variant="outline" className="shrink-0">
+                        <Badge variant="outline" className="shrink-0 gap-1">
+                          {run.shift === "DAY" ? (
+                            <Sun className="h-3 w-3" />
+                          ) : (
+                            <Moon className="h-3 w-3" />
+                          )}
                           {run.shift}
                         </Badge>
                       </div>

@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Moon, Sun } from "lucide-react";
 import type { ProductionRunRow } from "@/types/production-run";
 
 interface ProductionRunDetailDialogProps {
@@ -94,7 +95,12 @@ export function ProductionRunDetailDialog({
 
         <div className="space-y-0">
           <DetailRow label="Date" value={new Date(run.created_at).toLocaleDateString()} />
-          <DetailRow label="Shift" value={<Badge variant="outline">{run.shift}</Badge>} />
+          <DetailRow label="Shift" value={
+            <Badge variant="outline" className="gap-1">
+              {run.shift === "DAY" ? <Sun className="h-3 w-3" /> : <Moon className="h-3 w-3" />}
+              {run.shift}
+            </Badge>
+          } />
           <DetailRow label="Machine" value={run.machine_name} />
           <DetailRow label="Target Quantity" value={run.target_quantity} />
           <DetailRow label="Actual Produced" value={run.actual_pieces_produced} />

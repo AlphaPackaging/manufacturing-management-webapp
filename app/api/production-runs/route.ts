@@ -148,6 +148,58 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
+  // ── Check stock availability before proceeding ─────────────────────
+
+  if (raw_material_id && raw_material_bags_used > 0) {
+    const { data: rmStock, error: rmStockErr } = await supabase
+      .from("products_stock")
+      .select("quantity")
+      .eq("product_id", raw_material_id)
+      .single();
+
+    if (rmStockErr || !rmStock) {
+      return json(
+        { success: false, error: "Raw material stock record not found" },
+        400
+      );
+    }
+
+    if (Number(rmStock.quantity) < raw_material_bags_used) {
+      return json(
+        {
+          success: false,
+          error: `Insufficient raw material stock. Available: ${Number(rmStock.quantity)} bags, required: ${raw_material_bags_used} bags.`,
+        },
+        400
+      );
+    }
+  }
+
+  if (master_batch_id && master_batch_bags_used > 0) {
+    const { data: mbStock, error: mbStockErr } = await supabase
+      .from("products_stock")
+      .select("quantity")
+      .eq("product_id", master_batch_id)
+      .single();
+
+    if (mbStockErr || !mbStock) {
+      return json(
+        { success: false, error: "Master batch stock record not found" },
+        400
+      );
+    }
+
+    if (Number(mbStock.quantity) < master_batch_bags_used) {
+      return json(
+        {
+          success: false,
+          error: `Insufficient master batch stock. Available: ${Number(mbStock.quantity)} bags, required: ${master_batch_bags_used} bags.`,
+        },
+        400
+      );
+    }
+  }
+
   // Build insert payload
   const insertData: Record<string, unknown> = {
     product_id,
