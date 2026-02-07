@@ -15,9 +15,8 @@ export default async function StockPage({
     .select("id, quantity, uom, products!inner ( id, sku, name, type )")
     .order("name", { ascending: true, referencedTable: "products" });
 
-  if (type) {
-    query = query.eq("products.type", type);
-  }
+  const activeType = type ?? "FINISHED_GOOD";
+  query = query.eq("products.type", activeType);
 
   if (q) {
     query = query.or(`name.ilike.%${q}%,sku.ilike.%${q}%`, {
@@ -27,22 +26,24 @@ export default async function StockPage({
 
   const { data } = await query;
 
-  const productsStock = (data ?? []).map((row) => {
-    const product = Array.isArray(row.products)
-      ? row.products[0]
-      : row.products;
-    return {
-      id: row.id as string,
-      quantity: Number(row.quantity),
-      uom: row.uom as string,
-      products: {
-        id: product.id as string,
-        sku: product.sku as string,
-        name: product.name as string,
-        type: product.type as string,
-      },
-    };
-  });
+  const productsStock = (data ?? [])
+    .map((row) => {
+      const product = Array.isArray(row.products)
+        ? row.products[0]
+        : row.products;
+      return {
+        id: row.id as string,
+        quantity: Number(row.quantity),
+        uom: row.uom as string,
+        products: {
+          id: product.id as string,
+          sku: product.sku as string,
+          name: product.name as string,
+          type: product.type as string,
+        },
+      };
+    })
+    .sort((a, b) => a.products.name.localeCompare(b.products.name));
 
   return (
     <div className="space-y-4">

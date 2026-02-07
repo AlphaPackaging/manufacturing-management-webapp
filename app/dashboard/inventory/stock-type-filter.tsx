@@ -8,17 +8,15 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 const productTypes = [
-  { value: "ALL", label: "All" },
-  { value: "RAW_MATERIAL", label: "Raw Material" },
   { value: "FINISHED_GOOD", label: "Finished Good" },
+  { value: "RAW_MATERIAL", label: "Raw Material" },
   { value: "MASTER_BATCH", label: "Master Batch" },
-  { value: "REGRIND_MATERIAL", label: "Regrind Material" },
 ];
 
 export function StockTypeFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const current = searchParams.get("type") ?? "ALL";
+  const current = searchParams.get("type") ?? "FINISHED_GOOD";
   const currentSearch = searchParams.get("q") ?? "";
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -28,11 +26,7 @@ export function StockTypeFilter() {
 
   function handleFilter(value: string) {
     const params = new URLSearchParams(searchParams.toString());
-    if (value === "ALL") {
-      params.delete("type");
-    } else {
-      params.set("type", value);
-    }
+    params.set("type", value);
     navigate(params);
   }
 
