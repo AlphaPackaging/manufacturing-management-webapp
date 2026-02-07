@@ -66,6 +66,7 @@ CREATE TABLE public.products (
   parent_raw_material_id  uuid REFERENCES public.products(id),
   parent_master_batch_id  uuid REFERENCES public.products(id),
   target_production_per_shift integer,
+  reorder_level           numeric NOT NULL DEFAULT 10,
   machine_type            text,
   created_at              timestamptz NOT NULL DEFAULT now(),
   updated_at              timestamptz NOT NULL DEFAULT now(),
@@ -80,6 +81,7 @@ CREATE TABLE public.products (
 COMMENT ON TABLE  public.products IS 'Centralized table for all product types (FG, Raw, etc.)';
 COMMENT ON COLUMN public.products.parent_raw_material_id IS 'Link specific to Finished Goods pointing to their primary Raw Material';
 COMMENT ON COLUMN public.products.parent_master_batch_id IS 'Link specific to Finished Goods pointing to their Master Batch';
+COMMENT ON COLUMN public.products.reorder_level IS 'Stock quantity threshold below which a re-order alert is triggered';
 
 
 -- Current stock levels for products, updated by stock_ledger events

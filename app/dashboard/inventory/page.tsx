@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { StockTypeFilter } from "./stock-type-filter";
 import { InventoryTable } from "./inventory-table";
+import { ReorderAlerts } from "./reorder-alerts";
 
 export default async function StockPage({
   searchParams,
@@ -24,9 +25,18 @@ export default async function StockPage({
     });
   }
 
-  const { data } = await query;
+  // Fetch re-order alerts: raw materials & master batches where stock <= reorder_level
+  const reorderQuery = supabase
+    .from("products_stock")
+    .select(
+      "quantity, uom, products!inner ( sku, name, type, reorder_level )"
+    )
+    .in("products.type", ["RAW_MATERIAL", "MASTER_BATCH"])
+    .order("name", { ascending: true, referencedTable: "products" });
 
-  const productsStock = (data ?? [])
+  const [stockRes, reorderRes] = await Promise.all([query, reorderQuery]);
+
+  const productsStock = (stockRes.data ?? [])
     .map((row) => {
       const product = Array.isArray(row.products)
         ? row.products[0]
@@ -46,9 +56,29 @@ export default async function StockPage({
     })
     .sort((a, b) => a.products.name.localeCompare(b.products.name));
 
+  const reorderItems = (reorderRes.data ?? [])
+    .map((row) => {
+      const product = Array.isArray(row.products)
+        ? row.products[0]
+        : row.products;
+      return {
+        productName: product.name as string,
+        productSku: product.sku as string,
+        productType: product.type as string,
+        quantity: Number(row.quantity),
+        reorderLevel: Number(product.reorder_level),
+        uom: row.uom as string,
+      };
+    })
+    .filter((item) => item.quantity <= item.reorderLevel)
+    .sort((a, b) => a.quantity - b.quantity);
+
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-semibold">Inventory</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-semibold">Inventory</h2>
+        <ReorderAlerts items={reorderItems} />
+      </div>
 
       <StockTypeFilter />
 
