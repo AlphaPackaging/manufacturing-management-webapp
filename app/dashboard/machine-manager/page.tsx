@@ -1,4 +1,6 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getUserRole, isAdmin } from "@/lib/auth/role";
 import { MachineTable } from "./machine-table";
 
 interface Machine {
@@ -12,6 +14,18 @@ interface Machine {
 
 export default async function MachineManagerPage() {
   const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    redirect("/login");
+  }
+
+  const role = await getUserRole(supabase, user.id);
+  if (!isAdmin(role)) {
+    redirect("/dashboard");
+  }
 
   const { data } = await supabase
     .from("machines")

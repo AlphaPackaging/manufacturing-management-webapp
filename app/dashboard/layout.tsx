@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import type { UserRole } from "@/lib/auth/role";
 import { SidebarNav } from "./sidebar-nav";
 import { LogoutButton } from "./logout-button";
 import { IdleTimeout } from "./idle-timeout";
@@ -20,11 +21,12 @@ export default async function DashboardLayout({
 
   const { data: profile } = await supabase
     .from("users_profile")
-    .select("first_name")
+    .select("first_name, role")
     .eq("user_id", user.id)
     .single();
 
   const greeting = profile?.first_name ? `Hi, ${profile.first_name}` : user.email;
+  const role = (profile?.role as UserRole) ?? null;
 
   return (
     <div className="flex min-h-screen">
@@ -32,7 +34,7 @@ export default async function DashboardLayout({
         <div className="flex h-14 items-center border-b px-4">
           <span className="text-lg font-semibold">APGL</span>
         </div>
-        <SidebarNav />
+        <SidebarNav role={role} />
       </aside>
       <div className="flex flex-1 flex-col">
         <header className="flex h-14 items-center justify-end border-b px-6">

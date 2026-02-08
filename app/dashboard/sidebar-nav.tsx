@@ -4,9 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Factory, Package, BookOpen, Cog, ClipboardList, Wrench } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { UserRole } from "@/lib/auth/role";
 
 type NavItem = { href: string; label: string; icon: React.ComponentType<{ className?: string }> };
-type NavSection = { label: string; items: NavItem[] };
+type NavSection = { label: string; items: NavItem[]; requiredRole?: UserRole };
 
 const navSections: NavSection[] = [
   {
@@ -30,6 +31,7 @@ const navSections: NavSection[] = [
   },
   {
     label: "Asset Manager",
+    requiredRole: "ADMIN",
     items: [
       { href: "/dashboard/product-manager", label: "Product Manager", icon: ClipboardList },
       { href: "/dashboard/machine-manager", label: "Machine Manager", icon: Wrench },
@@ -37,12 +39,20 @@ const navSections: NavSection[] = [
   },
 ];
 
-export function SidebarNav() {
+interface SidebarNavProps {
+  role: UserRole | null;
+}
+
+export function SidebarNav({ role }: SidebarNavProps) {
   const pathname = usePathname();
+
+  const visibleSections = navSections.filter(
+    (section) => !section.requiredRole || section.requiredRole === role
+  );
 
   return (
     <nav className="flex flex-col gap-1 px-3 py-4">
-      {navSections.map((section, i) => (
+      {visibleSections.map((section, i) => (
         <div key={i} className={cn(i > 0 && "mt-3")}>
           {section.label && (
             <p className="mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">

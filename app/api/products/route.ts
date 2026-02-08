@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getUserRole, isAdmin } from "@/lib/auth/role";
 import { NextRequest, NextResponse } from "next/server";
 
 const VALID_PRODUCT_TYPES = [
@@ -22,6 +23,11 @@ export async function PATCH(request: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) {
     return json({ success: false, error: "Unauthorized" }, 401);
+  }
+
+  const role = await getUserRole(supabase, user.id);
+  if (!isAdmin(role)) {
+    return json({ success: false, error: "Forbidden" }, 403);
   }
 
   let body: Record<string, unknown>;

@@ -1,4 +1,6 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getUserRole, isAdmin } from "@/lib/auth/role";
 import { ProductTable } from "./product-table";
 
 interface Product {
@@ -26,6 +28,18 @@ interface ReferenceProduct {
 
 export default async function ProductManagerPage() {
   const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    redirect("/login");
+  }
+
+  const role = await getUserRole(supabase, user.id);
+  if (!isAdmin(role)) {
+    redirect("/dashboard");
+  }
 
   const [productsRes, rawMaterialsRes, masterBatchesRes] = await Promise.all([
     supabase
