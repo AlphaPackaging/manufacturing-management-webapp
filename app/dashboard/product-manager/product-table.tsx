@@ -77,12 +77,12 @@ export function ProductTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>SKU</TableHead>
+              <TableHead className="print:hidden">SKU</TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>UOM</TableHead>
+              <TableHead className="print:hidden">Type</TableHead>
+              <TableHead className="print:hidden">UOM</TableHead>
               <TableHead>Color</TableHead>
-              <TableHead>Size</TableHead>
+              <TableHead className="print:hidden">Size</TableHead>
               <TableHead>Parent Raw Material</TableHead>
               <TableHead>Parent Master Batch</TableHead>
               <TableHead className="text-right">Target / Shift</TableHead>
@@ -104,16 +104,16 @@ export function ProductTable({
                   className="cursor-pointer hover:bg-muted/50"
                   onClick={() => handleRowClick(product)}
                 >
-                  <TableCell className="font-mono text-sm">{product.sku}</TableCell>
+                  <TableCell className="font-mono text-sm print:hidden">{product.sku}</TableCell>
                   <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>
+                  <TableCell className="print:hidden">
                     <Badge variant={TYPE_VARIANTS[product.type] ?? "secondary"}>
                       {TYPE_LABELS[product.type] ?? product.type}
                     </Badge>
                   </TableCell>
-                  <TableCell>{product.uom}</TableCell>
+                  <TableCell className="print:hidden">{product.uom}</TableCell>
                   <TableCell>{product.color ?? "—"}</TableCell>
-                  <TableCell>{product.size ?? "—"}</TableCell>
+                  <TableCell className="print:hidden">{product.size ?? "—"}</TableCell>
                   <TableCell>
                     {product.parent_raw_material_id
                       ? rawMaterialMap.get(product.parent_raw_material_id) ?? "—"

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getUserRole, isAdmin } from "@/lib/auth/role";
 import { MachineTable } from "./machine-table";
+import { PrintButton } from "@/components/shared/print-button";
 
 interface Machine {
   id: string;
@@ -36,7 +37,10 @@ export default async function MachineManagerPage() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-semibold">Machine Manager</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-semibold">Machine Manager</h2>
+        <PrintButton />
+      </div>
       <MachineTable machines={machines} />
     </div>
   );

@@ -124,3 +124,46 @@
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+  @page {
+    margin: 1cm;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide sidebar, header, and non-content elements */
+  aside,
+  header,
+  .print-hidden {
+    display: none !important;
+  }
+
+  /* Make main content full-width */
+  div.flex.min-h-screen {
+    display: block !important;
+  }
+
+  div.flex.min-h-screen > div {
+    width: 100% !important;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+
+  /* Keep table borders visible */
+  table {
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    border: 1px solid #d1d5db !important;
+  }
+}
